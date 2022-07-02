@@ -1,16 +1,13 @@
 package br.com.payment.api.model.dto.payment.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CreateWalletDTO {
 
-  private String ownerName;
+  String ownerName;
 
 }

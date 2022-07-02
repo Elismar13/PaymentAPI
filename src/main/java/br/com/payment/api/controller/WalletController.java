@@ -19,9 +19,11 @@ public class WalletController {
   @Autowired
   private WalletService walletService;
 
-  @PostMapping
-  public ResponseEntity<CreateWalletDTO> createNewUser(@RequestBody @Valid CreateWalletResponseDTO walletDTO) {
-    return null;
+  @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<CreateWalletResponseDTO> createNewUser(@RequestBody @Valid CreateWalletDTO walletDTO) throws Exception {
+    CreateWalletResponseDTO createdUser = walletService.createWallet(walletDTO);
+
+    return ResponseEntity.ok(createdUser);
   }
 
 
