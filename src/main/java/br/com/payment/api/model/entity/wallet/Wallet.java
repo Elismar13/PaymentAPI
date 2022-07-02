@@ -3,18 +3,15 @@ package br.com.payment.api.model.entity.wallet;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import javax.xml.datatype.DatatypeConstants;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Data
 @Entity
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
 @Table(name = "wallets")
 public class Wallet {
 
@@ -23,9 +20,9 @@ public class Wallet {
   @GeneratedValue(generator = "UUIDGenerator")
   private UUID id;
 
-  private String amount;
-  private String ownerName;
-  private LocalDateTime creationDate;
-  private String ownerId;
+  String ownerName;
+
+  @Column(name = "registrationDate", insertable = false)
+  LocalDateTime registrationDate;
 
 }
