@@ -1,7 +1,7 @@
 package br.com.payment.api.controller;
 
-import br.com.payment.api.model.dto.payment.request.CreateWalletDTO;
 import br.com.payment.api.model.dto.payment.response.CreateWalletResponseDTO;
+import br.com.payment.api.model.dto.payment.request.CreateWalletDTO;
 import br.com.payment.api.model.entity.wallet.Wallet;
 import br.com.payment.api.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ public class WalletController {
   private WalletService walletService;
 
   @PostMapping
-  public ResponseEntity<CreateWalletResponseDTO> createNewUser(@RequestBody @Valid CreateWalletDTO walletDTO) {
+  public ResponseEntity<CreateWalletDTO> createNewUser(@RequestBody @Valid CreateWalletResponseDTO walletDTO) {
     return null;
   }
 
