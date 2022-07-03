@@ -1,4 +1,4 @@
-package br.com.payment.api.model.dto.payment.request;
+package br.com.payment.api.model.dto.wallet.request;
 
 import lombok.*;
 
@@ -6,7 +6,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateWalletDTO {
+public class WalletDTO {
 
   String ownerName;
 

@@ -21,8 +21,6 @@ public class Wallet {
   private UUID id;
 
   String ownerName;
-
-  @Column(name = "registrationDate", insertable = false)
   LocalDateTime registrationDate;
 
 }

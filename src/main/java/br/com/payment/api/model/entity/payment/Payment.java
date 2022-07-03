@@ -1,25 +1,26 @@
 package br.com.payment.api.model.entity.payment;
 
 import lombok.*;
+import org.mapstruct.Mapping;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
 @Table(name = "payments")
 public class Payment {
 
   @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE)
   private Integer id;
 
-  private String amount;
+  private BigDecimal amount;
   private String ownerName;
+
   private LocalDateTime creationDate;
   private String ownerId;
 
