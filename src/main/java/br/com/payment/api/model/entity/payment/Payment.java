@@ -18,7 +18,7 @@ public class Payment {
   @GeneratedValue(strategy = GenerationType.SEQUENCE)
   private Integer id;
 
-  private BigDecimal amount;
+  private Number amount;
   private String ownerName;
 
   private LocalDateTime creationDate;

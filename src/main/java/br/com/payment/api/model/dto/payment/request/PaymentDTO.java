@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class PaymentDTO {
 
   private Integer id;
-  private BigDecimal amount;
+  private Number amount;
   private String ownerName;
   private LocalDateTime Date;
   private String ownerId;
