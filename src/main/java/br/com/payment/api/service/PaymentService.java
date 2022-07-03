@@ -1,6 +1,7 @@
 package br.com.payment.api.service;
 
 import br.com.payment.api.enums.PaymentIntervalsEnum;
+import br.com.payment.api.exception.payment.InsufficientPaymentLimitException;
 import br.com.payment.api.mapper.payment.PaymentMapper;
 import br.com.payment.api.model.dto.payment.request.PaymentDTO;
 import br.com.payment.api.model.dto.payment.response.PaymentResponseDTO;
@@ -59,10 +60,10 @@ public class PaymentService {
     }
   }
 
-  private void isMoneyOutOfLimit(LocalDateTime dateTime, Money amount) throws Exception {
+  private void isMoneyOutOfLimit(LocalDateTime dateTime, Money amount) throws InsufficientPaymentLimitException {
     PaymentIntervalsEnum currentValidLimit = PaymentUtils.checkHourLimit(dateTime);
     if(currentValidLimit.getAmount().subtract(amount).isNegative()) {
-      throw new Exception("Insufficient limit.");
+      throw new InsufficientPaymentLimitException(amount.getNumber());
     }
   }
 

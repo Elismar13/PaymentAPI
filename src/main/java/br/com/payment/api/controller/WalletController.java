@@ -1,5 +1,6 @@
 package br.com.payment.api.controller;
 
+import br.com.payment.api.exception.wallet.WalletAlreadyExistsException;
 import br.com.payment.api.model.dto.payment.request.PaymentDTO;
 import br.com.payment.api.model.dto.payment.response.PaymentResponseDTO;
 import br.com.payment.api.model.dto.payment.response.RemainingLimitResponseDTO;
@@ -27,7 +28,7 @@ public class WalletController {
   private PaymentService paymentService;
 
   @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<WalletResponseDTO> createNewUser(@RequestBody @Valid WalletDTO walletDTO) throws Exception {
+  public ResponseEntity<WalletResponseDTO> createNewUser(@RequestBody @Valid WalletDTO walletDTO) throws WalletAlreadyExistsException {
     WalletResponseDTO createdUser = walletService.createWallet(walletDTO);
 
     return ResponseEntity.ok(createdUser);
