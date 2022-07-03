@@ -26,17 +26,16 @@ public class PaymentService {
 
   private final PaymentMapper paymentMapper = PaymentMapper.INSTANCE;
 
-  public PaymentResponseDTO makePayment(String walletId, PaymentDTO paymentDTO) throws InsufficientPaymentLimitException {
+  public PaymentResponseDTO makePayment(String walletId, PaymentDTO paymentDTO, LocalDateTime dateTime) throws InsufficientPaymentLimitException {
     paymentDTO.setOwnerId(walletId);
-    validatePayment(walletId, paymentDTO);
+    validatePayment(walletId, paymentDTO, dateTime);
     Payment payment = paymentMapper.toPayment(paymentDTO);
     Payment savedPayment = paymentRepository.save(payment);
     return paymentMapper.toDTO(savedPayment);
   }
 
-  public RemainingLimitResponseDTO checkRemainingLimit(String walletId) {
-    LocalDateTime dateTime = LocalDateTime.now();
-    Money remainingLimit = getRemainingLimit(walletId);
+  public RemainingLimitResponseDTO checkRemainingLimit(String walletId, LocalDateTime dateTime) {
+    Money remainingLimit = getRemainingLimit(walletId, dateTime);
     return RemainingLimitResponseDTO.builder()
         .value(remainingLimit.getNumber())
         .build();
@@ -67,8 +66,7 @@ public class PaymentService {
     }
   }
 
-  private void validatePayment(String walletId, PaymentDTO paymentDTO) throws InsufficientPaymentLimitException {
-    LocalDateTime dateTime = LocalDateTime.now();
+  private void validatePayment(String walletId, PaymentDTO paymentDTO, LocalDateTime dateTime) throws InsufficientPaymentLimitException {
     paymentDTO.setDate(dateTime);
     Money amount = Money.of(paymentDTO.getAmount(), "BRL");
 
@@ -77,8 +75,7 @@ public class PaymentService {
     isMoneyOutOfLimit(dateTime, totalPaid);
   }
 
-  private Money getRemainingLimit(String walletId) {
-    LocalDateTime dateTime = LocalDateTime.now();
+  private Money getRemainingLimit(String walletId, LocalDateTime dateTime) {
     Money totalPaid = getTotalPaid(walletId, dateTime, Money.of(0, "BRL"));
     PaymentIntervalsEnum currentValidLimit = PaymentUtils.checkHourLimit(dateTime);
     return currentValidLimit.getAmount().subtract(totalPaid);

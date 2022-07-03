@@ -6,7 +6,6 @@ import br.com.payment.api.model.dto.payment.response.PaymentResponseDTO;
 import br.com.payment.api.model.dto.payment.response.RemainingLimitResponseDTO;
 import br.com.payment.api.model.dto.wallet.request.WalletDTO;
 import br.com.payment.api.model.dto.wallet.response.WalletResponseDTO;
-import br.com.payment.api.model.entity.wallet.Wallet;
 import br.com.payment.api.service.PaymentService;
 import br.com.payment.api.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/wallets")
@@ -36,15 +35,15 @@ public class WalletController {
 
 
   @GetMapping(value = "/{walletId}/limits", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<RemainingLimitResponseDTO>  getAvailableCashLimit(@PathVariable("walletId") String walletId) {
-    RemainingLimitResponseDTO checkRemainingLimit = paymentService.checkRemainingLimit(walletId);
+  public ResponseEntity<RemainingLimitResponseDTO> getAvailableCashLimit(@PathVariable("walletId") String walletId) {
+    RemainingLimitResponseDTO checkRemainingLimit = paymentService.checkRemainingLimit(walletId, LocalDateTime.now());
 
     return ResponseEntity.ok(checkRemainingLimit);
   }
 
   @PostMapping(value = "/{walletId}/payments", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<PaymentResponseDTO> makePayment(@PathVariable String walletId, @RequestBody @Valid PaymentDTO walletDTO) throws Exception {
-    PaymentResponseDTO createdPayment = paymentService.makePayment(walletId, walletDTO);
+    PaymentResponseDTO createdPayment = paymentService.makePayment(walletId, walletDTO, LocalDateTime.now());
 
     return ResponseEntity.ok(createdPayment);
   }
