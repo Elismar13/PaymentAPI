@@ -4,6 +4,6 @@ import java.util.Locale;
 
 public class PaymentConstants {
 
-  public static final Locale BRAZIL = new Locale("pt", "BR");
+  public static final Locale BRAZIL = new Locale("BRL");
 
 }
