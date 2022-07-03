@@ -17,6 +17,7 @@
         <java.version>11</java.version>
         <postgresql.version>42.3.6</postgresql.version>
         <mapstruct.version>1.5.2.Final</mapstruct.version>
+        <money-api.1.1>1.4.2</money-api.1.1>
     </properties>
     <dependencies>
         <dependency>
@@ -56,6 +57,12 @@
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>${mapstruct.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.javamoney</groupId>
+            <artifactId>moneta</artifactId>
+            <version>1.4.2</version>
+            <type>pom</type>
         </dependency>
     </dependencies>
 
