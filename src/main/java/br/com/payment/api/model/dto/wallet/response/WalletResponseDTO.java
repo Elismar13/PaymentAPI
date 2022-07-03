@@ -1,4 +1,4 @@
-package br.com.payment.api.model.dto.payment.response;
+package br.com.payment.api.model.dto.wallet.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CreateWalletResponseDTO {
+public class WalletResponseDTO {
 
   private UUID id;
   private String ownerName;
