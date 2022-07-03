@@ -1,8 +1,11 @@
 package br.com.payment.api.controller;
 
-import br.com.payment.api.model.dto.payment.response.CreateWalletResponseDTO;
-import br.com.payment.api.model.dto.payment.request.CreateWalletDTO;
+import br.com.payment.api.model.dto.payment.request.PaymentDTO;
+import br.com.payment.api.model.dto.payment.response.PaymentResponseDTO;
+import br.com.payment.api.model.dto.wallet.request.WalletDTO;
+import br.com.payment.api.model.dto.wallet.response.WalletResponseDTO;
 import br.com.payment.api.model.entity.wallet.Wallet;
+import br.com.payment.api.service.PaymentService;
 import br.com.payment.api.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -19,9 +22,12 @@ public class WalletController {
   @Autowired
   private WalletService walletService;
 
+  @Autowired
+  private PaymentService paymentService;
+
   @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<CreateWalletResponseDTO> createNewUser(@RequestBody @Valid CreateWalletDTO walletDTO) throws Exception {
-    CreateWalletResponseDTO createdUser = walletService.createWallet(walletDTO);
+  public ResponseEntity<WalletResponseDTO> createNewUser(@RequestBody @Valid WalletDTO walletDTO) throws Exception {
+    WalletResponseDTO createdUser = walletService.createWallet(walletDTO);
 
     return ResponseEntity.ok(createdUser);
   }
@@ -33,8 +39,10 @@ public class WalletController {
   }
 
   @PostMapping(value = "/{walletId}/payments", produces = MediaType.APPLICATION_JSON_VALUE)
-  public Wallet makePayment(@PathVariable("walletId") String walletId) {
-    return null;
+  public ResponseEntity<PaymentResponseDTO> makePayment(@PathVariable String walletId, @RequestBody @Valid PaymentDTO walletDTO) throws Exception {
+    PaymentResponseDTO createdPayment = paymentService.makePayment(walletId, walletDTO);
+
+    return ResponseEntity.ok(createdPayment);
   }
 
 }
