@@ -26,7 +26,7 @@ public class PaymentService {
 
   private final PaymentMapper paymentMapper = PaymentMapper.INSTANCE;
 
-  public PaymentResponseDTO makePayment(String walletId, PaymentDTO paymentDTO) throws Exception {
+  public PaymentResponseDTO makePayment(String walletId, PaymentDTO paymentDTO) throws InsufficientPaymentLimitException {
     paymentDTO.setOwnerId(walletId);
     validatePayment(walletId, paymentDTO);
     Payment payment = paymentMapper.toPayment(paymentDTO);
@@ -67,7 +67,7 @@ public class PaymentService {
     }
   }
 
-  private void validatePayment(String walletId, PaymentDTO paymentDTO) throws Exception {
+  private void validatePayment(String walletId, PaymentDTO paymentDTO) throws InsufficientPaymentLimitException {
     LocalDateTime dateTime = LocalDateTime.now();
     paymentDTO.setDate(dateTime);
     Money amount = Money.of(paymentDTO.getAmount(), "BRL");
