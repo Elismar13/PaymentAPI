@@ -2,6 +2,7 @@ package br.com.payment.api.controller;
 
 import br.com.payment.api.model.dto.payment.request.PaymentDTO;
 import br.com.payment.api.model.dto.payment.response.PaymentResponseDTO;
+import br.com.payment.api.model.dto.payment.response.RemainingLimitResponseDTO;
 import br.com.payment.api.model.dto.wallet.request.WalletDTO;
 import br.com.payment.api.model.dto.wallet.response.WalletResponseDTO;
 import br.com.payment.api.model.entity.wallet.Wallet;
@@ -34,8 +35,10 @@ public class WalletController {
 
 
   @GetMapping(value = "/{walletId}/limits", produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Wallet> getAvailableCashLimit(@PathVariable("walletId") String walletId) {
-    return null;
+  public ResponseEntity<RemainingLimitResponseDTO>  getAvailableCashLimit(@PathVariable("walletId") String walletId) {
+    RemainingLimitResponseDTO checkRemainingLimit = paymentService.checkRemainingLimit(walletId);
+
+    return ResponseEntity.ok(checkRemainingLimit);
   }
 
   @PostMapping(value = "/{walletId}/payments", produces = MediaType.APPLICATION_JSON_VALUE)

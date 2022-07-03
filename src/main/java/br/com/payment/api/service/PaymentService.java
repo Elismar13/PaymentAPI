@@ -4,6 +4,7 @@ import br.com.payment.api.enums.PaymentIntervalsEnum;
 import br.com.payment.api.mapper.payment.PaymentMapper;
 import br.com.payment.api.model.dto.payment.request.PaymentDTO;
 import br.com.payment.api.model.dto.payment.response.PaymentResponseDTO;
+import br.com.payment.api.model.dto.payment.response.RemainingLimitResponseDTO;
 import br.com.payment.api.model.entity.payment.Payment;
 import br.com.payment.api.repository.PaymentRepository;
 import br.com.payment.api.utils.PaymentUtils;
@@ -32,12 +33,20 @@ public class PaymentService {
     return paymentMapper.toDTO(savedPayment);
   }
 
-  private Money getTotalPaid(String userId, LocalDateTime dateTime, Money amount) {
+  public RemainingLimitResponseDTO checkRemainingLimit(String walletId) {
+    LocalDateTime dateTime = LocalDateTime.now();
+    Money remainingLimit = getRemainingLimit(walletId);
+    return RemainingLimitResponseDTO.builder()
+        .value(remainingLimit.getNumber())
+        .build();
+  }
+
+  private Money getTotalPaid(String walletId, LocalDateTime dateTime, Money amount) {
     LocalDateTime firstDate = LocalDateTime.of(dateTime.toLocalDate(), LocalTime.of(0, 0));
     LocalDateTime lastDate = LocalDateTime.of(dateTime.toLocalDate(), LocalTime.of(23, 59, 59));
     Money zero = Money.of(0, "BRL");
 
-    Optional<List<Payment>> dailyPayments = paymentRepository.findAllByOwnerIdAndCreationDateBetween(userId, firstDate, lastDate);
+    Optional<List<Payment>> dailyPayments = paymentRepository.findAllByOwnerIdAndCreationDateBetween(walletId, firstDate, lastDate);
 
     if(dailyPayments.isPresent()) {
        Optional<Money> totalSpent = dailyPayments.get().stream()
@@ -65,6 +74,13 @@ public class PaymentService {
     isMoneyOutOfLimit(dateTime, amount);
     Money totalPaid = getTotalPaid(walletId, dateTime, amount);
     isMoneyOutOfLimit(dateTime, totalPaid);
+  }
+
+  private Money getRemainingLimit(String walletId) {
+    LocalDateTime dateTime = LocalDateTime.now();
+    Money totalPaid = getTotalPaid(walletId, dateTime, Money.of(0, "BRL"));
+    PaymentIntervalsEnum currentValidLimit = PaymentUtils.checkHourLimit(dateTime);
+    return currentValidLimit.getAmount().subtract(totalPaid);
   }
 
 }
