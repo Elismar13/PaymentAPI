@@ -12,3 +12,15 @@ spring:
     hibernate:
       ddl-auto: create
     show-sql: true
+
+  messages:
+    basename: classpath:messages_pt_BR
+    encoding: UTF-8
+
+server:
+  error:
+    include-message: always
+    include-stacktrace: never
+    include-exception: false
+    whitelabel:
+      enabled: true

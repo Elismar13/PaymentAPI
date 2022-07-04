@@ -12,4 +12,6 @@ public interface WalletRepository extends CrudRepository<Wallet, String> {
 
   Optional<Wallet> findByOwnerName(String ownerName);
 
+  Optional<Wallet> findById(UUID id);
+
 }

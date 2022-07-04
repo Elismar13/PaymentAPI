@@ -1,26 +1,35 @@
 package br.com.payment.api.model.entity.wallet;
 
-import lombok.*;
+import br.com.payment.api.model.entity.payment.Payment;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import javax.xml.datatype.DatatypeConstants;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Table(name = "wallets")
 public class Wallet {
 
   @Id
   @GenericGenerator(name = "UUIDGenerator", strategy = "uuid2")
   @GeneratedValue(generator = "UUIDGenerator")
+  @Type(type="org.hibernate.type.UUIDCharType")
   private UUID id;
+  private String ownerName;
+  private LocalDateTime registrationDate;
 
-  String ownerName;
-  LocalDateTime registrationDate;
+  @OneToMany(mappedBy = "wallet", cascade = CascadeType.ALL)
+  private List<Payment> payments;
 
 }

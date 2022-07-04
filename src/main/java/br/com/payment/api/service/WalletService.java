@@ -1,5 +1,6 @@
 package br.com.payment.api.service;
 
+import br.com.payment.api.exception.wallet.WalletAlreadyExistsException;
 import br.com.payment.api.mapper.wallet.WalletMapper;
 import br.com.payment.api.model.dto.wallet.request.WalletDTO;
 import br.com.payment.api.model.dto.wallet.response.WalletResponseDTO;
@@ -17,18 +18,18 @@ public class WalletService {
   @Autowired
   private WalletRepository walletRepository;
 
-  public WalletResponseDTO createWallet(WalletDTO walletDTO) throws Exception {
+  public WalletResponseDTO createWallet(WalletDTO walletDTO) throws WalletAlreadyExistsException {
     verifyIfWalletAlreadyExists(walletDTO.getOwnerName());
     Wallet wallet = walletMapper.toWallet(walletDTO);
     Wallet savedWallet = walletRepository.save(wallet);
     return walletMapper.toDTO(savedWallet);
   }
 
-  private void verifyIfWalletAlreadyExists(String ownerName) throws Exception {
+  private void verifyIfWalletAlreadyExists(String ownerName) throws WalletAlreadyExistsException {
     Optional<Wallet> wallet = walletRepository.findByOwnerName(ownerName);
 
     if (wallet.isPresent()) {
-      throw new Exception("User wallet already exists!");
+      throw new WalletAlreadyExistsException(ownerName);
     }
   }
 

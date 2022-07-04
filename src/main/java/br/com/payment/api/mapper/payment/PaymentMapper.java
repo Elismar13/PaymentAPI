@@ -15,6 +15,6 @@ public interface PaymentMapper {
   @Mapping(source = "date", target = "creationDate")
   Payment toPayment(PaymentDTO PaymentDTO);
 
-  PaymentResponseDTO toDTO(Payment Payment);
+  PaymentDTO toDTO(Payment Payment);
 
 }
