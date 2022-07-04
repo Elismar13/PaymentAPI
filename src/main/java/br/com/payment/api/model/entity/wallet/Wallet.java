@@ -1,16 +1,16 @@
 package br.com.payment.api.model.entity.wallet;
 
+import br.com.payment.api.model.entity.payment.Payment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -21,11 +21,15 @@ import java.util.UUID;
 @Table(name = "wallets")
 public class Wallet {
 
-  String ownerName;
-  LocalDateTime registrationDate;
   @Id
   @GenericGenerator(name = "UUIDGenerator", strategy = "uuid2")
   @GeneratedValue(generator = "UUIDGenerator")
+  @Type(type="org.hibernate.type.UUIDCharType")
   private UUID id;
+  private String ownerName;
+  private LocalDateTime registrationDate;
+
+  @OneToMany(mappedBy = "wallet", cascade = CascadeType.ALL)
+  private List<Payment> payments;
 
 }

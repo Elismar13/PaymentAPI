@@ -1,11 +1,13 @@
 package br.com.payment.api.model.entity.payment;
 
+import br.com.payment.api.model.entity.wallet.Wallet;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
@@ -21,9 +23,11 @@ public class Payment {
   private Integer id;
 
   private Number amount;
-  private String ownerName;
 
   private LocalDateTime creationDate;
-  private String ownerId;
+
+  @ManyToOne
+  @JoinColumn(name = "owner_id", nullable = false)
+  private Wallet wallet;
 
 }
