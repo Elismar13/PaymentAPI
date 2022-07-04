@@ -6,7 +6,9 @@ import br.com.payment.api.model.dto.payment.request.PaymentDTO;
 import br.com.payment.api.model.dto.payment.response.PaymentResponseDTO;
 import br.com.payment.api.model.dto.payment.response.RemainingLimitResponseDTO;
 import br.com.payment.api.model.entity.payment.Payment;
+import br.com.payment.api.model.entity.wallet.Wallet;
 import br.com.payment.api.repository.PaymentRepository;
+import br.com.payment.api.repository.WalletRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -32,7 +35,7 @@ import static org.mockito.Mockito.when;
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class PaymentServiceTest {
 
-  public static final String WALLETID = "7a05eb6c-3a07-4839-8c62-b4b93521bd27";
+  public static final UUID WALLETID = UUID.fromString("7a05eb6c-3a07-4839-8c62-b4b93521bd27");
   public static final LocalDateTime CREATIONDATE_WEEKEND = LocalDateTime.parse("2022-07-03T15:21:32.144631");
   public static final LocalDateTime CREATIONDATE_DAILY = LocalDateTime.parse("2022-07-04T15:00:00.144631");
   public static final LocalDateTime CREATIONDATE_NIGHTTIME = LocalDateTime.parse("2022-07-04T22:00:00.144631");
@@ -43,25 +46,23 @@ public class PaymentServiceTest {
 
   @InjectMocks
   PaymentService paymentService;
-
   PaymentMapper paymentMapper = PaymentMapper.INSTANCE;
+  @Mock
+  private WalletRepository walletRepository;
 
   @Test
-  public void whenDaylightPaymentIsMadeItShouldReturnPaymentInformation() {
+  public void whenDaylightPaymentIsMadeItShouldReturnNothing() {
     // given
     PaymentDTO paymentDTO = createValidPaymentDTO();
     Payment payment = createValidPayment();
+    Wallet wallet = createWallet();
 
     // when
     when(paymentRepository.save(Mockito.any(Payment.class))).thenReturn(payment);
+    when(walletRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.ofNullable(wallet));
 
-    PaymentResponseDTO paymentResponseDTO = paymentMapper.toDTO(payment);
     // then
-    PaymentResponseDTO createdPaymentResponseDTO = paymentService.makePayment(WALLETID, paymentDTO, CREATIONDATE_DAILY);
-
-    assertThat(50, is(createdPaymentResponseDTO.getAmount()));
-    assertThat(WALLETID, is(createdPaymentResponseDTO.getOwnerId()));
-    assertThat(OWNERNAME, is(createdPaymentResponseDTO.getOwnerName()));
+    paymentService.makePayment(WALLETID, paymentDTO, CREATIONDATE_DAILY);
   }
 
   @Test
@@ -69,23 +70,20 @@ public class PaymentServiceTest {
     // given
     PaymentDTO paymentDTO = createValidPaymentDTO();
     Payment payment = createValidPayment();
+    Wallet wallet = createWallet();
     List<Payment> paymentList = validDaylightList();
-    PaymentResponseDTO paymentResponseExpected = paymentMapper.toDTO(payment);
 
     // when
     when(paymentRepository.save(Mockito.any(Payment.class))).thenReturn(payment);
+    when(walletRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.ofNullable(wallet));
     doReturn(Optional.of(paymentList)).when(paymentRepository)
-        .findAllByOwnerIdAndCreationDateBetween(Mockito.any(String.class),
+        .findAllByWallet_IdAndCreationDateBetween(Mockito.any(UUID.class),
             Mockito.any(LocalDateTime.class),
             Mockito.any(LocalDateTime.class)
         );
 
     // then
-    PaymentResponseDTO paymentResponse = paymentService.makePayment(WALLETID, paymentDTO, CREATIONDATE_DAILY);
-
-    assertThat(paymentResponseExpected.getAmount(), is(paymentResponse.getAmount()));
-    assertThat(paymentResponseExpected.getOwnerId(), is(paymentResponse.getOwnerId()));
-    assertThat(paymentResponseExpected.getOwnerName(), is(paymentResponse.getOwnerName()));
+    paymentService.makePayment(WALLETID, paymentDTO, CREATIONDATE_DAILY);
   }
 
   @Test
@@ -93,13 +91,14 @@ public class PaymentServiceTest {
     // given
     PaymentDTO paymentDTO = createValidPaymentDTO();
     Payment payment = createValidPayment();
+    Wallet wallet = createWallet();
     List<Payment> paymentList = invalidDaylightList();
-    PaymentResponseDTO paymentResponseExpected = paymentMapper.toDTO(payment);
 
     // when
     when(paymentRepository.save(Mockito.any(Payment.class))).thenReturn(payment);
+    when(walletRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.ofNullable(wallet));
     doReturn(Optional.of(paymentList)).when(paymentRepository)
-        .findAllByOwnerIdAndCreationDateBetween(Mockito.any(String.class),
+        .findAllByWallet_IdAndCreationDateBetween(Mockito.any(UUID.class),
             Mockito.any(LocalDateTime.class),
             Mockito.any(LocalDateTime.class)
         );
@@ -110,21 +109,18 @@ public class PaymentServiceTest {
   }
 
   @Test
-  public void whenNightTimePaymentIsMadeItShouldReturnPaymentInformation() {
+  public void whenNightTimePaymentIsMadeItShouldReturnNothing() {
     // given
     PaymentDTO paymentDTO = createValidPaymentDTO();
     Payment payment = createValidPayment();
+    Wallet wallet = createWallet();
 
     // when
     when(paymentRepository.save(Mockito.any(Payment.class))).thenReturn(payment);
+    when(walletRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.ofNullable(wallet));
 
-    PaymentResponseDTO paymentResponseDTO = paymentMapper.toDTO(payment);
     // then
-    PaymentResponseDTO createdPaymentResponseDTO = paymentService.makePayment(WALLETID, paymentDTO, CREATIONDATE_NIGHTTIME);
-
-    assertThat(50, is(createdPaymentResponseDTO.getAmount()));
-    assertThat(WALLETID, is(createdPaymentResponseDTO.getOwnerId()));
-    assertThat(OWNERNAME, is(createdPaymentResponseDTO.getOwnerName()));
+    paymentService.makePayment(WALLETID, paymentDTO, CREATIONDATE_NIGHTTIME);
   }
 
   @Test
@@ -132,23 +128,20 @@ public class PaymentServiceTest {
     // given
     PaymentDTO paymentDTO = createValidPaymentDTO();
     Payment payment = createValidPayment();
+    Wallet wallet = createWallet();
     List<Payment> paymentList = validNightTimeList();
-    PaymentResponseDTO paymentResponseExpected = paymentMapper.toDTO(payment);
 
     // when
     when(paymentRepository.save(Mockito.any(Payment.class))).thenReturn(payment);
+    when(walletRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.ofNullable(wallet));
     doReturn(Optional.of(paymentList)).when(paymentRepository)
-        .findAllByOwnerIdAndCreationDateBetween(Mockito.any(String.class),
+        .findAllByWallet_IdAndCreationDateBetween(Mockito.any(UUID.class),
             Mockito.any(LocalDateTime.class),
             Mockito.any(LocalDateTime.class)
         );
 
     // then
-    PaymentResponseDTO paymentResponse = paymentService.makePayment(WALLETID, paymentDTO, CREATIONDATE_NIGHTTIME);
-
-    assertThat(paymentResponseExpected.getAmount(), is(paymentResponse.getAmount()));
-    assertThat(paymentResponseExpected.getOwnerId(), is(paymentResponse.getOwnerId()));
-    assertThat(paymentResponseExpected.getOwnerName(), is(paymentResponse.getOwnerName()));
+    paymentService.makePayment(WALLETID, paymentDTO, CREATIONDATE_NIGHTTIME);
   }
 
   @Test
@@ -156,13 +149,14 @@ public class PaymentServiceTest {
     // given
     PaymentDTO paymentDTO = createValidPaymentDTO();
     Payment payment = createValidPayment();
+    Wallet wallet = createWallet();
     List<Payment> paymentList = invalidNightTimeList();
-    PaymentResponseDTO paymentResponseExpected = paymentMapper.toDTO(payment);
 
     // when
     when(paymentRepository.save(Mockito.any(Payment.class))).thenReturn(payment);
+    when(walletRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.ofNullable(wallet));
     doReturn(Optional.of(paymentList)).when(paymentRepository)
-        .findAllByOwnerIdAndCreationDateBetween(Mockito.any(String.class),
+        .findAllByWallet_IdAndCreationDateBetween(Mockito.any(UUID.class),
             Mockito.any(LocalDateTime.class),
             Mockito.any(LocalDateTime.class)
         );
@@ -171,23 +165,20 @@ public class PaymentServiceTest {
     Throwable exception = assertThrows(InsufficientPaymentLimitException.class, () -> paymentService.makePayment(WALLETID, paymentDTO, CREATIONDATE_NIGHTTIME));
     assertThat(exception.getMessage(), is(equalTo("The amount 1005 has exceed the remaining payment limit")));
   }
-
   @Test
-  public void whenWeekendPaymentIsMadeItShouldReturnPaymentInformation() {
+  public void whenWeekendPaymentIsMadeItShouldReturnNothing() {
     // given
     PaymentDTO paymentDTO = createValidPaymentDTO();
     Payment payment = createValidPayment();
+    Wallet wallet = createWallet();
 
     // when
     when(paymentRepository.save(Mockito.any(Payment.class))).thenReturn(payment);
+    when(walletRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.ofNullable(wallet));
 
-    PaymentResponseDTO paymentResponseDTO = paymentMapper.toDTO(payment);
     // then
-    PaymentResponseDTO createdPaymentResponseDTO = paymentService.makePayment(WALLETID, paymentDTO, CREATIONDATE_WEEKEND);
+    paymentService.makePayment(WALLETID, paymentDTO, CREATIONDATE_WEEKEND);
 
-    assertThat(50, is(createdPaymentResponseDTO.getAmount()));
-    assertThat(WALLETID, is(createdPaymentResponseDTO.getOwnerId()));
-    assertThat(OWNERNAME, is(createdPaymentResponseDTO.getOwnerName()));
   }
 
   @Test
@@ -196,22 +187,20 @@ public class PaymentServiceTest {
     PaymentDTO paymentDTO = createValidPaymentDTO();
     Payment payment = createValidPayment();
     List<Payment> paymentList = validWeekendList();
-    PaymentResponseDTO paymentResponseExpected = paymentMapper.toDTO(payment);
+    Wallet wallet = createWallet();
 
     // when
     when(paymentRepository.save(Mockito.any(Payment.class))).thenReturn(payment);
+    when(walletRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.ofNullable(wallet));
+    when(walletRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.ofNullable(wallet));
     doReturn(Optional.of(paymentList)).when(paymentRepository)
-        .findAllByOwnerIdAndCreationDateBetween(Mockito.any(String.class),
+        .findAllByWallet_IdAndCreationDateBetween(Mockito.any(UUID.class),
             Mockito.any(LocalDateTime.class),
             Mockito.any(LocalDateTime.class)
         );
 
     // then
-    PaymentResponseDTO paymentResponse = paymentService.makePayment(WALLETID, paymentDTO, CREATIONDATE_WEEKEND);
-
-    assertThat(paymentResponseExpected.getAmount(), is(paymentResponse.getAmount()));
-    assertThat(paymentResponseExpected.getOwnerId(), is(paymentResponse.getOwnerId()));
-    assertThat(paymentResponseExpected.getOwnerName(), is(paymentResponse.getOwnerName()));
+    paymentService.makePayment(WALLETID, paymentDTO, CREATIONDATE_WEEKEND);
   }
 
   @Test
@@ -219,13 +208,14 @@ public class PaymentServiceTest {
     // given
     PaymentDTO paymentDTO = createValidPaymentDTO();
     Payment payment = createValidPayment();
+    Wallet wallet = createWallet();
     List<Payment> paymentList = invalidWeekendList();
-    PaymentResponseDTO paymentResponseExpected = paymentMapper.toDTO(payment);
 
     // when
     when(paymentRepository.save(Mockito.any(Payment.class))).thenReturn(payment);
+    when(walletRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.ofNullable(wallet));
     doReturn(Optional.of(paymentList)).when(paymentRepository)
-        .findAllByOwnerIdAndCreationDateBetween(Mockito.any(String.class),
+        .findAllByWallet_IdAndCreationDateBetween(Mockito.any(UUID.class),
             Mockito.any(LocalDateTime.class),
             Mockito.any(LocalDateTime.class)
         );
@@ -240,13 +230,15 @@ public class PaymentServiceTest {
     // given
     PaymentDTO paymentDTO = createValidPaymentDTO();
     Payment payment = createValidPayment();
+    Wallet wallet = createWallet();
     List<Payment> paymentList = validDaylightList();
     RemainingLimitResponseDTO paymentResponseExpected = RemainingLimitResponseDTO.builder().value(50).build();
 
     // when
     when(paymentRepository.save(Mockito.any(Payment.class))).thenReturn(payment);
+    when(walletRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.ofNullable(wallet));
     doReturn(Optional.of(paymentList)).when(paymentRepository)
-        .findAllByOwnerIdAndCreationDateBetween(Mockito.any(String.class),
+        .findAllByWallet_IdAndCreationDateBetween(Mockito.any(UUID.class),
             Mockito.any(LocalDateTime.class),
             Mockito.any(LocalDateTime.class)
         );
@@ -260,15 +252,16 @@ public class PaymentServiceTest {
   @Test
   public void checkIfHasValidNightTimeLimit() {
     // given
-    PaymentDTO paymentDTO = createValidPaymentDTO();
     Payment payment = createValidPayment();
+    Wallet wallet = createWallet();
     List<Payment> paymentList = validNightTimeList();
     RemainingLimitResponseDTO paymentResponseExpected = RemainingLimitResponseDTO.builder().value(50).build();
 
     // when
     when(paymentRepository.save(Mockito.any(Payment.class))).thenReturn(payment);
+    when(walletRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.ofNullable(wallet));
     doReturn(Optional.of(paymentList)).when(paymentRepository)
-        .findAllByOwnerIdAndCreationDateBetween(Mockito.any(String.class),
+        .findAllByWallet_IdAndCreationDateBetween(Mockito.any(UUID.class),
             Mockito.any(LocalDateTime.class),
             Mockito.any(LocalDateTime.class)
         );
@@ -279,38 +272,40 @@ public class PaymentServiceTest {
     assertThat(paymentResponseExpected.getValue().intValue(), equalTo(paymentResponse.getValue().intValue()));
   }
 
+  private Wallet createWallet() {
+    return Wallet.builder()
+        .ownerName(OWNERNAME)
+        .id(WALLETID)
+        .build();
+  }
+
   public Payment createValidPayment() {
     return Payment.builder()
-        .ownerName(OWNERNAME)
-        .ownerId(WALLETID)
+        .wallet(createWallet())
         .amount(50)
         .build();
   }
 
   public PaymentDTO createValidPaymentDTO() {
     return PaymentDTO.builder()
-        .ownerName(OWNERNAME)
-        .ownerId(WALLETID)
         .amount(50)
         .build();
   }
 
   public PaymentDTO createInvalidPayment() {
     return PaymentDTO.builder()
-        .ownerName(OWNERNAME)
-        .ownerId(WALLETID)
         .amount(55)
         .build();
   }
 
   public List<Payment> validDaylightList() {
     return Arrays.asList(Payment.builder()
-            .ownerId(WALLETID)
+            .wallet(createWallet())
             .amount(3000)
             .creationDate(CREATIONDATE_DAILY)
             .build(),
         Payment.builder()
-            .ownerId(WALLETID)
+            .wallet(createWallet())
             .amount(950)
             .creationDate(CREATIONDATE_DAILY)
             .build()
@@ -319,12 +314,12 @@ public class PaymentServiceTest {
 
   public List<Payment> invalidDaylightList() {
     return Arrays.asList(Payment.builder()
-            .ownerId(WALLETID)
+            .wallet(createWallet())
             .amount(2500)
             .creationDate(CREATIONDATE_DAILY)
             .build(),
         Payment.builder()
-            .ownerId(WALLETID)
+            .wallet(createWallet())
             .amount(1455)
             .creationDate(CREATIONDATE_DAILY)
             .build()
@@ -333,12 +328,12 @@ public class PaymentServiceTest {
 
   public List<Payment> validNightTimeList() {
     return Arrays.asList(Payment.builder()
-            .ownerId(WALLETID)
+            .wallet(createWallet())
             .amount(800)
             .creationDate(CREATIONDATE_NIGHTTIME)
             .build(),
         Payment.builder()
-            .ownerId(WALLETID)
+            .wallet(createWallet())
             .amount(150)
             .creationDate(CREATIONDATE_NIGHTTIME)
             .build()
@@ -347,12 +342,12 @@ public class PaymentServiceTest {
 
   public List<Payment> invalidNightTimeList() {
     return Arrays.asList(Payment.builder()
-            .ownerId(WALLETID)
+            .wallet(createWallet())
             .amount(800)
             .creationDate(CREATIONDATE_NIGHTTIME)
             .build(),
         Payment.builder()
-            .ownerId(WALLETID)
+            .wallet(createWallet())
             .amount(155)
             .creationDate(CREATIONDATE_NIGHTTIME)
             .build()
@@ -361,12 +356,12 @@ public class PaymentServiceTest {
 
   public List<Payment> validWeekendList() {
     return Arrays.asList(Payment.builder()
-            .ownerId(WALLETID)
+            .wallet(createWallet())
             .amount(800)
             .creationDate(CREATIONDATE_WEEKEND)
             .build(),
         Payment.builder()
-            .ownerId(WALLETID)
+            .wallet(createWallet())
             .amount(150)
             .creationDate(CREATIONDATE_WEEKEND)
             .build()
@@ -375,12 +370,12 @@ public class PaymentServiceTest {
 
   public List<Payment> invalidWeekendList() {
     return Arrays.asList(Payment.builder()
-            .ownerId(WALLETID)
+            .wallet(createWallet())
             .amount(800)
             .creationDate(CREATIONDATE_WEEKEND)
             .build(),
         Payment.builder()
-            .ownerId(WALLETID)
+            .wallet(createWallet())
             .amount(155)
             .creationDate(CREATIONDATE_WEEKEND)
             .build()
