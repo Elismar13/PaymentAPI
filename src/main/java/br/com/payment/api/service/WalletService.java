@@ -29,7 +29,7 @@ public class WalletService {
     Optional<Wallet> wallet = walletRepository.findByOwnerName(ownerName);
 
     if (wallet.isPresent()) {
-      throw new WalletAlreadyExistsException("User wallet already exists!");
+      throw new WalletAlreadyExistsException(ownerName);
     }
   }
 

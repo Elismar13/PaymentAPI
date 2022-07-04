@@ -3,7 +3,6 @@ package br.com.payment.api.controller;
 import br.com.payment.api.constants.RegexConstants;
 import br.com.payment.api.exception.wallet.WalletAlreadyExistsException;
 import br.com.payment.api.model.dto.payment.request.PaymentDTO;
-import br.com.payment.api.model.dto.payment.response.PaymentResponseDTO;
 import br.com.payment.api.model.dto.payment.response.RemainingLimitResponseDTO;
 import br.com.payment.api.model.dto.wallet.request.WalletDTO;
 import br.com.payment.api.model.dto.wallet.response.WalletResponseDTO;
@@ -40,21 +39,20 @@ public class WalletController {
 
 
   @GetMapping(value = "/{walletId}/limits", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<RemainingLimitResponseDTO> getAvailableCashLimit(@PathVariable("walletId") UUID walletId) {
+  public ResponseEntity<RemainingLimitResponseDTO> getAvailableCashLimit(@PathVariable("walletId") @NotNull UUID walletId) {
     RemainingLimitResponseDTO checkRemainingLimit = paymentService.checkRemainingLimit(walletId, LocalDateTime.now());
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(checkRemainingLimit);
+    return ResponseEntity.status(HttpStatus.OK).body(checkRemainingLimit);
   }
 
   @PostMapping(value = "/{walletId}/payments", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<PaymentResponseDTO> makePayment(@PathVariable
-                                                          @NotNull
-                                                          @Pattern(regexp = RegexConstants.REGEX_VALIDATE_UUID, message = "{payment.wallet.uuid}")
-                                                              UUID walletId,
-                                                        @RequestBody @Valid PaymentDTO walletDTO) {
-    PaymentResponseDTO createdPayment = paymentService.makePayment(walletId, walletDTO, LocalDateTime.now());
+  public ResponseEntity makePayment(@PathVariable @NotNull
+                                    @Pattern(regexp = RegexConstants.REGEX_VALIDATE_UUID, message = "{payment.wallet.uuid}")
+                                        UUID walletId,
+                                    @RequestBody @Valid PaymentDTO walletDTO) {
+    paymentService.makePayment(walletId, walletDTO, LocalDateTime.now());
 
-    return ResponseEntity.ok(createdPayment);
+    return ResponseEntity.status(HttpStatus.OK).build();
   }
 
 }
