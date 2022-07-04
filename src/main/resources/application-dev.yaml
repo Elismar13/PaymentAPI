@@ -14,7 +14,7 @@ spring:
     show-sql: true
 
   messages:
-    basename: classpath:messages
+    basename: classpath:messages_pt_BR
     encoding: UTF-8
 
 server:
