@@ -18,7 +18,10 @@ public class PaymentResponseDTO {
   @JsonIgnore
   private Integer id;
 
+  @JsonIgnore
   private Number amount;
+
+  @JsonIgnore
   private String ownerName;
 
   @JsonIgnore
