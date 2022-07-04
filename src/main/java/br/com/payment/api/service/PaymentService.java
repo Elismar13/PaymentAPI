@@ -19,9 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static br.com.payment.api.utils.PaymentUtils.isMoneyOutOfLimit;
 
@@ -29,22 +27,29 @@ import static br.com.payment.api.utils.PaymentUtils.isMoneyOutOfLimit;
 public class PaymentService {
 
   private final PaymentMapper paymentMapper = PaymentMapper.INSTANCE;
+
   @Autowired
   private PaymentRepository paymentRepository;
+
   @Autowired
   private WalletRepository walletRepository;
 
-  public PaymentResponseDTO makePayment(UUID walletId, PaymentDTO paymentDTO, LocalDateTime dateTime) throws InsufficientPaymentLimitException, WalletAlreadyExistsException {
+  public void makePayment(UUID walletId, PaymentDTO paymentDTO, LocalDateTime dateTime) throws InsufficientPaymentLimitException, WalletAlreadyExistsException {
     Optional<Wallet> wallet = walletRepository.findById(walletId);
+    Payment payment = paymentMapper.toPayment(paymentDTO);
 
     if (wallet.isPresent()) {
       Wallet savedWallet = wallet.get();
       validatePayment(walletId, paymentDTO, dateTime);
-      Payment payment = paymentMapper.toPayment(paymentDTO);
       payment.setWallet(savedWallet);
+
+      if(Objects.isNull(savedWallet.getPayments())) {
+        savedWallet.setPayments(new ArrayList<>());
+      }
+
       savedWallet.getPayments().add(payment);
       walletRepository.save(savedWallet);
-      return paymentMapper.toDTO(payment);
+      return;
     }
 
     throw new WalletNotFountException();
