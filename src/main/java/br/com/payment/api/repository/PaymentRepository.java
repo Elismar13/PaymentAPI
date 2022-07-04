@@ -7,12 +7,13 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface PaymentRepository extends CrudRepository<Payment, String> {
 
   Optional<Payment> findPaymentById(Integer id);
 
-  Optional<List<Payment>> findAllByOwnerIdAndCreationDateBetween(String ownerId, LocalDateTime startDate, LocalDateTime finalDate);
+  Optional<List<Payment>> findAllByWallet_IdAndCreationDateBetween(UUID wallet_id, LocalDateTime creationDate, LocalDateTime creationDate2);
 
 }

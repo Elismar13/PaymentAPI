@@ -46,7 +46,7 @@ public class PaymentService {
     LocalDateTime lastDate = LocalDateTime.of(dateTime.toLocalDate(), LocalTime.of(23, 59, 59));
     Money zero = Money.of(0, "BRL");
 
-    Optional<List<Payment>> dailyPayments = paymentRepository.findAllByOwnerIdAndCreationDateBetween(walletId, firstDate, lastDate);
+    Optional<List<Payment>> dailyPayments = paymentRepository.findAllByWallet_IdAndCreationDateBetween(walletId, firstDate, lastDate);
 
     if(dailyPayments.isPresent()) {
        Optional<Money> totalSpent = dailyPayments.get().stream()
