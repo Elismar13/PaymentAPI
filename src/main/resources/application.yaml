@@ -1,8 +1,5 @@
 spring:
   datasource:
-    hikari:
-      connectionTimeout: ${HIRAKI_TIMEOUT}
-      maximumPoolSize: ${HIRAKI_MAX_POLLSIZE}
     url: ${POSTGRES_URL}
     username: ${POSTGRES_USERNAME}
     password: ${POSTGRES_PASSWORD}
@@ -18,3 +15,6 @@ server:
     include-exception: false
     whitelabel:
       enabled: true
+  port: ${APP_PORT}
+  servlet:
+    context-path: "/api/v1/payment"
