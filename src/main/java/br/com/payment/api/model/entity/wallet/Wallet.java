@@ -24,7 +24,7 @@ public class Wallet {
   @Id
   @GenericGenerator(name = "UUIDGenerator", strategy = "uuid2")
   @GeneratedValue(generator = "UUIDGenerator")
-  @Type(type="org.hibernate.type.UUIDCharType")
+  @Column(name = "id", updatable = false, nullable = false)
   private UUID id;
   private String ownerName;
   private LocalDateTime registrationDate;

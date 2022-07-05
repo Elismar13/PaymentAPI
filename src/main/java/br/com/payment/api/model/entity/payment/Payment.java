@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -19,10 +20,10 @@ import java.time.LocalDateTime;
 public class Payment {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
-  private Number amount;
+  private BigDecimal amount;
 
   private LocalDateTime creationDate;
 
