@@ -9,6 +9,7 @@ import br.com.payment.api.repository.WalletRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -18,9 +19,10 @@ public class WalletService {
   @Autowired
   private WalletRepository walletRepository;
 
-  public WalletResponseDTO createWallet(WalletDTO walletDTO) throws WalletAlreadyExistsException {
+  public WalletResponseDTO createWallet(WalletDTO walletDTO, LocalDateTime createdAt) throws WalletAlreadyExistsException {
     verifyIfWalletAlreadyExists(walletDTO.getOwnerName());
     Wallet wallet = walletMapper.toWallet(walletDTO);
+    wallet.setRegistrationDate(createdAt);
     Wallet savedWallet = walletRepository.save(wallet);
     return walletMapper.toDTO(savedWallet);
   }
