@@ -1,0 +1,24 @@
+version: '2'
+
+services:
+  app:
+    image: 'docker-spring-boot-postgres:latest'
+    build:
+      context: .
+    container_name: app
+    depends_on:
+      - db
+    env_file:
+      - env/.env
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./install-extensions.sql /docker-entrypoint-initdb.d/
+
+  db:
+    image: 'postgres:12-alpine'
+    container_name: db
+    environment:
+      - POSTGRES_USER=thushima
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=payment-api
