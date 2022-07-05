@@ -32,7 +32,7 @@ public class WalletController {
 
   @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<WalletResponseDTO> createNewUser(@RequestBody @Valid WalletDTO walletDTO) throws WalletAlreadyExistsException {
-    WalletResponseDTO createdUser = walletService.createWallet(walletDTO);
+    WalletResponseDTO createdUser = walletService.createWallet(walletDTO, LocalDateTime.now());
 
     return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
   }
