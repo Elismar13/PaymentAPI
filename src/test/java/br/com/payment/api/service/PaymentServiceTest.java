@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -76,11 +77,8 @@ public class PaymentServiceTest {
     // when
     when(paymentRepository.save(Mockito.any(Payment.class))).thenReturn(payment);
     when(walletRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.ofNullable(wallet));
-    doReturn(Optional.of(paymentList)).when(paymentRepository)
-        .findAllByWallet_IdAndCreationDateBetween(Mockito.any(UUID.class),
-            Mockito.any(LocalDateTime.class),
-            Mockito.any(LocalDateTime.class)
-        );
+    doReturn(Optional.of(wallet)).when(walletRepository)
+        .findById(Mockito.any(UUID.class));
 
     // then
     paymentService.makePayment(WALLETID, paymentDTO, CREATIONDATE_DAILY);
@@ -93,15 +91,13 @@ public class PaymentServiceTest {
     Payment payment = createValidPayment();
     Wallet wallet = createWallet();
     List<Payment> paymentList = invalidDaylightList();
+    wallet.setPayments(paymentList);
 
     // when
     when(paymentRepository.save(Mockito.any(Payment.class))).thenReturn(payment);
     when(walletRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.ofNullable(wallet));
-    doReturn(Optional.of(paymentList)).when(paymentRepository)
-        .findAllByWallet_IdAndCreationDateBetween(Mockito.any(UUID.class),
-            Mockito.any(LocalDateTime.class),
-            Mockito.any(LocalDateTime.class)
-        );
+    doReturn(Optional.of(wallet)).when(walletRepository)
+        .findById(Mockito.any(UUID.class));
 
     // then
     Throwable exception = assertThrows(InsufficientPaymentLimitException.class, () -> paymentService.makePayment(WALLETID, paymentDTO, CREATIONDATE_DAILY));
@@ -134,11 +130,8 @@ public class PaymentServiceTest {
     // when
     when(paymentRepository.save(Mockito.any(Payment.class))).thenReturn(payment);
     when(walletRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.ofNullable(wallet));
-    doReturn(Optional.of(paymentList)).when(paymentRepository)
-        .findAllByWallet_IdAndCreationDateBetween(Mockito.any(UUID.class),
-            Mockito.any(LocalDateTime.class),
-            Mockito.any(LocalDateTime.class)
-        );
+    doReturn(Optional.of(wallet)).when(walletRepository)
+        .findById(Mockito.any(UUID.class));
 
     // then
     paymentService.makePayment(WALLETID, paymentDTO, CREATIONDATE_NIGHTTIME);
@@ -151,16 +144,13 @@ public class PaymentServiceTest {
     Payment payment = createValidPayment();
     Wallet wallet = createWallet();
     List<Payment> paymentList = invalidNightTimeList();
+    wallet.setPayments(paymentList);
 
     // when
     when(paymentRepository.save(Mockito.any(Payment.class))).thenReturn(payment);
     when(walletRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.ofNullable(wallet));
-    doReturn(Optional.of(paymentList)).when(paymentRepository)
-        .findAllByWallet_IdAndCreationDateBetween(Mockito.any(UUID.class),
-            Mockito.any(LocalDateTime.class),
-            Mockito.any(LocalDateTime.class)
-        );
-
+    doReturn(Optional.of(wallet)).when(walletRepository)
+        .findById(Mockito.any(UUID.class));
     // then
     Throwable exception = assertThrows(InsufficientPaymentLimitException.class, () -> paymentService.makePayment(WALLETID, paymentDTO, CREATIONDATE_NIGHTTIME));
     assertThat(exception.getMessage(), is(equalTo("The amount 1005 has exceed the remaining payment limit")));
@@ -193,11 +183,8 @@ public class PaymentServiceTest {
     when(paymentRepository.save(Mockito.any(Payment.class))).thenReturn(payment);
     when(walletRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.ofNullable(wallet));
     when(walletRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.ofNullable(wallet));
-    doReturn(Optional.of(paymentList)).when(paymentRepository)
-        .findAllByWallet_IdAndCreationDateBetween(Mockito.any(UUID.class),
-            Mockito.any(LocalDateTime.class),
-            Mockito.any(LocalDateTime.class)
-        );
+    doReturn(Optional.of(wallet)).when(walletRepository)
+        .findById(Mockito.any(UUID.class));
 
     // then
     paymentService.makePayment(WALLETID, paymentDTO, CREATIONDATE_WEEKEND);
@@ -210,15 +197,13 @@ public class PaymentServiceTest {
     Payment payment = createValidPayment();
     Wallet wallet = createWallet();
     List<Payment> paymentList = invalidWeekendList();
+    wallet.setPayments(paymentList);
 
     // when
     when(paymentRepository.save(Mockito.any(Payment.class))).thenReturn(payment);
     when(walletRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.ofNullable(wallet));
-    doReturn(Optional.of(paymentList)).when(paymentRepository)
-        .findAllByWallet_IdAndCreationDateBetween(Mockito.any(UUID.class),
-            Mockito.any(LocalDateTime.class),
-            Mockito.any(LocalDateTime.class)
-        );
+    doReturn(Optional.of(wallet)).when(walletRepository)
+        .findById(Mockito.any(UUID.class));
 
     // then
     Throwable exception = assertThrows(InsufficientPaymentLimitException.class, () -> paymentService.makePayment(WALLETID, paymentDTO, CREATIONDATE_WEEKEND));
@@ -232,16 +217,14 @@ public class PaymentServiceTest {
     Payment payment = createValidPayment();
     Wallet wallet = createWallet();
     List<Payment> paymentList = validDaylightList();
+    wallet.setPayments(paymentList);
     RemainingLimitResponseDTO paymentResponseExpected = RemainingLimitResponseDTO.builder().value(50).build();
 
     // when
     when(paymentRepository.save(Mockito.any(Payment.class))).thenReturn(payment);
     when(walletRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.ofNullable(wallet));
-    doReturn(Optional.of(paymentList)).when(paymentRepository)
-        .findAllByWallet_IdAndCreationDateBetween(Mockito.any(UUID.class),
-            Mockito.any(LocalDateTime.class),
-            Mockito.any(LocalDateTime.class)
-        );
+    doReturn(Optional.of(wallet)).when(walletRepository)
+        .findById(Mockito.any(UUID.class));
 
     // then
     RemainingLimitResponseDTO paymentResponse = paymentService.checkRemainingLimit(WALLETID, CREATIONDATE_DAILY);
@@ -255,16 +238,14 @@ public class PaymentServiceTest {
     Payment payment = createValidPayment();
     Wallet wallet = createWallet();
     List<Payment> paymentList = validNightTimeList();
+    wallet.setPayments(paymentList);
     RemainingLimitResponseDTO paymentResponseExpected = RemainingLimitResponseDTO.builder().value(50).build();
 
     // when
     when(paymentRepository.save(Mockito.any(Payment.class))).thenReturn(payment);
     when(walletRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.ofNullable(wallet));
-    doReturn(Optional.of(paymentList)).when(paymentRepository)
-        .findAllByWallet_IdAndCreationDateBetween(Mockito.any(UUID.class),
-            Mockito.any(LocalDateTime.class),
-            Mockito.any(LocalDateTime.class)
-        );
+    doReturn(Optional.of(wallet)).when(walletRepository)
+        .findById(Mockito.any(UUID.class));
 
     // then
     RemainingLimitResponseDTO paymentResponse = paymentService.checkRemainingLimit(WALLETID, CREATIONDATE_NIGHTTIME);
@@ -282,31 +263,31 @@ public class PaymentServiceTest {
   public Payment createValidPayment() {
     return Payment.builder()
         .wallet(createWallet())
-        .amount(50)
+        .amount(BigDecimal.valueOf(50))
         .build();
   }
 
   public PaymentDTO createValidPaymentDTO() {
     return PaymentDTO.builder()
-        .amount(50)
+        .amount(BigDecimal.valueOf(50))
         .build();
   }
 
   public PaymentDTO createInvalidPayment() {
     return PaymentDTO.builder()
-        .amount(55)
+        .amount(BigDecimal.valueOf(55))
         .build();
   }
 
   public List<Payment> validDaylightList() {
     return Arrays.asList(Payment.builder()
             .wallet(createWallet())
-            .amount(3000)
+            .amount(BigDecimal.valueOf(3000))
             .creationDate(CREATIONDATE_DAILY)
             .build(),
         Payment.builder()
             .wallet(createWallet())
-            .amount(950)
+            .amount(BigDecimal.valueOf(950))
             .creationDate(CREATIONDATE_DAILY)
             .build()
     );
@@ -315,12 +296,12 @@ public class PaymentServiceTest {
   public List<Payment> invalidDaylightList() {
     return Arrays.asList(Payment.builder()
             .wallet(createWallet())
-            .amount(2500)
+            .amount(BigDecimal.valueOf(2500))
             .creationDate(CREATIONDATE_DAILY)
             .build(),
         Payment.builder()
             .wallet(createWallet())
-            .amount(1455)
+            .amount(BigDecimal.valueOf(1455))
             .creationDate(CREATIONDATE_DAILY)
             .build()
     );
@@ -329,12 +310,12 @@ public class PaymentServiceTest {
   public List<Payment> validNightTimeList() {
     return Arrays.asList(Payment.builder()
             .wallet(createWallet())
-            .amount(800)
+            .amount(BigDecimal.valueOf(800))
             .creationDate(CREATIONDATE_NIGHTTIME)
             .build(),
         Payment.builder()
             .wallet(createWallet())
-            .amount(150)
+            .amount(BigDecimal.valueOf(150))
             .creationDate(CREATIONDATE_NIGHTTIME)
             .build()
     );
@@ -343,12 +324,12 @@ public class PaymentServiceTest {
   public List<Payment> invalidNightTimeList() {
     return Arrays.asList(Payment.builder()
             .wallet(createWallet())
-            .amount(800)
+            .amount(BigDecimal.valueOf(800))
             .creationDate(CREATIONDATE_NIGHTTIME)
             .build(),
         Payment.builder()
             .wallet(createWallet())
-            .amount(155)
+            .amount(BigDecimal.valueOf(155))
             .creationDate(CREATIONDATE_NIGHTTIME)
             .build()
     );
@@ -357,12 +338,12 @@ public class PaymentServiceTest {
   public List<Payment> validWeekendList() {
     return Arrays.asList(Payment.builder()
             .wallet(createWallet())
-            .amount(800)
+            .amount(BigDecimal.valueOf(800))
             .creationDate(CREATIONDATE_WEEKEND)
             .build(),
         Payment.builder()
             .wallet(createWallet())
-            .amount(150)
+            .amount(BigDecimal.valueOf(150))
             .creationDate(CREATIONDATE_WEEKEND)
             .build()
     );
@@ -371,12 +352,12 @@ public class PaymentServiceTest {
   public List<Payment> invalidWeekendList() {
     return Arrays.asList(Payment.builder()
             .wallet(createWallet())
-            .amount(800)
+            .amount(BigDecimal.valueOf(800))
             .creationDate(CREATIONDATE_WEEKEND)
             .build(),
         Payment.builder()
             .wallet(createWallet())
-            .amount(155)
+            .amount(BigDecimal.valueOf(155))
             .creationDate(CREATIONDATE_WEEKEND)
             .build()
     );

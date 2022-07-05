@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Optional;
@@ -73,7 +74,7 @@ public class WalletControllerTest {
     WalletResponseDTO walletDTO = createWalletResponseDTO();
 
     // when
-    doReturn(walletDTO).when(walletService).createWallet(any(WalletDTO.class));
+    doReturn(walletDTO).when(walletService).createWallet(any(WalletDTO.class), any(LocalDateTime.class));
 
     mockMvc.perform(post("/wallets")
             .contentType(MediaType.APPLICATION_JSON)
@@ -179,7 +180,7 @@ public class WalletControllerTest {
 
   private PaymentDTO createPaymentDTO() {
     return PaymentDTO.builder()
-        .amount(2500)
+        .amount(BigDecimal.valueOf(2500))
         .Date(LocalDateTime.parse("2022-07-03T16:47:59.009"))
         .build();
   }
