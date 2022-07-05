@@ -10,6 +10,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -22,7 +23,7 @@ public class PaymentDTO {
 
   @Min(0)
   @Max(value = 1000, message = "{payment.maximum.limit}")
-  private Number amount;
+  private BigDecimal amount;
 
   private LocalDateTime Date;
 
