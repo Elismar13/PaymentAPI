@@ -6,7 +6,6 @@ import br.com.payment.api.exception.wallet.WalletAlreadyExistsException;
 import br.com.payment.api.exception.wallet.WalletNotFountException;
 import br.com.payment.api.mapper.payment.PaymentMapper;
 import br.com.payment.api.model.dto.payment.request.PaymentDTO;
-import br.com.payment.api.model.dto.payment.response.PaymentResponseDTO;
 import br.com.payment.api.model.dto.payment.response.RemainingLimitResponseDTO;
 import br.com.payment.api.model.entity.payment.Payment;
 import br.com.payment.api.model.entity.wallet.Wallet;
@@ -43,7 +42,7 @@ public class PaymentService {
       validatePayment(walletId, paymentDTO, dateTime);
       payment.setWallet(savedWallet);
 
-      if(Objects.isNull(savedWallet.getPayments())) {
+      if (Objects.isNull(savedWallet.getPayments())) {
         savedWallet.setPayments(new ArrayList<>());
       }
 
@@ -60,7 +59,9 @@ public class PaymentService {
     LocalDateTime lastDate = LocalDateTime.of(dateTime.toLocalDate(), LocalTime.of(23, 59, 59));
     Money zero = Money.of(0, "BRL");
 
-    Optional<List<Payment>> dailyPayments = paymentRepository.findAllByWallet_IdAndCreationDateBetween(walletId, firstDate, lastDate);
+    Optional<Wallet> walletSaved = walletRepository.findById(walletId);
+
+    Optional<List<Payment>> dailyPayments = walletSaved.map(Wallet::getPayments);
 
     if (dailyPayments.isPresent()) {
       Optional<Money> totalSpent = dailyPayments.get().stream()
@@ -73,8 +74,8 @@ public class PaymentService {
     }
   }
 
-  public RemainingLimitResponseDTO checkRemainingLimit(UUID walletId, LocalDateTime dateTime) {
-    Money remainingLimit = getRemainingLimit(walletId, dateTime);
+  public RemainingLimitResponseDTO checkRemainingLimit(UUID wallet, LocalDateTime dateTime) {
+    Money remainingLimit = getRemainingLimit(wallet, dateTime);
     return RemainingLimitResponseDTO.builder()
         .value(remainingLimit.getNumber())
         .build();
@@ -89,8 +90,8 @@ public class PaymentService {
     isMoneyOutOfLimit(dateTime, totalPaid);
   }
 
-  private Money getRemainingLimit(UUID walletId, LocalDateTime dateTime) {
-    Money totalPaid = getTotalPaid(walletId, dateTime, Money.of(0, "BRL"));
+  private Money getRemainingLimit(UUID wallet, LocalDateTime dateTime) {
+    Money totalPaid = getTotalPaid(wallet, dateTime, Money.of(0, "BRL"));
     PaymentIntervalsEnum currentValidLimit = PaymentUtils.checkHourLimit(dateTime);
     return currentValidLimit.getAmount().subtract(totalPaid);
   }
